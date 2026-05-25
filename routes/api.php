@@ -82,3 +82,13 @@ Route::get(
     '/reports/analytics',
     [PostController::class, 'analytics']
 );
+
+Route::get(
+    '/chat/unread/{userId}',
+    [MessageController::class, 'unread']
+);
+
+Route::post(
+    '/chat/read/{userId}',
+    [MessageController::class, 'markAsRead']
+);

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\RoomMessage;
 
 use App\Models\Message;
 
@@ -64,5 +66,39 @@ class MessageController extends Controller
         }
 
         return response()->json($users);
+    }
+
+    public function markAsRead($userId)
+        {
+            $user = User::find($userId);
+
+            $user->last_chat_read_at = now();
+
+            $user->save();
+
+            return response()->json([
+                'message' => 'updated'
+            ]);
+        }
+
+    public function unread($userId)
+    {
+        $user = User::find($userId);
+
+        $count = RoomMessage::where(
+            'created_at',
+            '>',
+            $user->last_chat_read_at
+        )
+        ->where(
+            'user_id',
+            '!=',
+            $userId
+        )
+        ->count();
+
+        return response()->json([
+            'count' => $count
+        ]);
     }
 }

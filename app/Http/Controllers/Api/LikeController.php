@@ -30,9 +30,35 @@ class LikeController extends Controller
         }
 
         Like::create([
+
             'user_id' => $request->user_id,
+
             'post_id' => $request->post_id,
+
         ]);
+
+        // Ambil postingan
+
+        $post = Post::find(
+            $request->post_id
+        );
+
+        // Jangan notif diri sendiri
+
+        if ($post->user_id != $request->user_id) {
+
+            Notification::create([
+
+                'user_id' => $post->user_id,
+
+                'from_user_id' => $request->user_id,
+
+                'post_id' => $request->post_id,
+
+                'type' => 'like',
+
+            ]);
+        }
 
         return response()->json([
             'message' => 'Liked'
