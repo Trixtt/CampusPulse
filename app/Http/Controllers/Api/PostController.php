@@ -70,45 +70,86 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        try {
+        $imagePath = null;
 
-            $imagePath = null;
+        if ($request->hasFile('image')) {
 
-            if ($request->hasFile('image')) {
+            $imagePath = $request
+                ->file('image')
+                ->store('posts', 'public');
+        }
 
-                $imagePath = $request
-                    ->file('image')
-                    ->store('posts', 'public');
+        $priority = "Medium";
+            $content = strtolower($request->content);
+
+            if (
+                str_contains($content, 'kebakaran') ||
+                str_contains($content, 'darurat')
+            ) {
+
+                $priority = "Urgent";
             }
 
-            $post = Post::create([
+            elseif (
+                str_contains($content, 'pencurian') ||
+                str_contains($content, 'gelap') ||
+                str_contains($content, 'bahaya')
+            ) {
 
-                'user_id' => $request->user_id,
+                $priority = "High";
+            }
 
-                'content' => $request->content,
+            elseif (
+                str_contains($content, 'rusak')
+            ) {
 
-                'category' => $request->category,
+                $priority = "Medium";
+            }
 
-                'type' => $request->type,
+            elseif (
+                str_contains($content, 'kotor')
+            ) {
 
-                'image' => $imagePath,
+                $priority = "Low";
+            }
 
-                'location' => $request->location,
+        $flagged = false;
+        $badWords = [
+            'bodoh',
+            'bangsat',
+            'tolol',
+            'anjing',
+            'goblok',
+        ];
 
-                'status' => $request->status,
+        foreach ($badWords as $word) {
 
-                'priority' => $request->priority,
+            if (str_contains($content, $word)) {
 
-            ]);
+                $flagged = true;
 
-            return response()->json($post);
-
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+                break;
+            }
         }
+        
+            $post = Post::create([
+            'user_id' => $request->user_id,
+            'category' => $request->category,
+            'content' => $request->content,
+            'type' => $request->type,
+            'priority' => $request->priority,
+            'status' => $request->status,
+            'location' => $request->location,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'image' => 'nullable|image',
+            'flagged' => $flagged,
+        ]);
+
+        return response()->json([
+            'message' => 'Posting berhasil',
+            'post' => $post
+        ]);
     }
 
     public function destroy($id)
