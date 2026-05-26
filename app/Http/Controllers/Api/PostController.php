@@ -74,7 +74,8 @@ class PostController extends Controller
 
         if ($request->hasFile('image')) {
 
-            $imagePath = $request->file('image')
+            $imagePath = $request
+                ->file('image')
                 ->store('posts', 'public');
         }
 
@@ -141,7 +142,7 @@ class PostController extends Controller
             'location' => $request->location,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'image' => $imagePath,
+            'image' => 'nullable|image',
             'flagged' => $flagged,
         ]);
 

@@ -13,13 +13,19 @@ class Notification extends Model
 
         'user_id',
 
-        'from_user_id',
+        'content',
 
-        'post_id',
+        'category',
 
         'type',
 
-        'is_read',
+        'image',
+
+        'location',
+
+        'status',
+
+        'priority',
 
     ];
 
