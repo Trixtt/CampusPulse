@@ -142,7 +142,7 @@ class PostController extends Controller
             'location' => $request->location,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'image' => 'nullable|image',
+            'image' => $imagePath,
             'flagged' => $flagged,
         ]);
 
