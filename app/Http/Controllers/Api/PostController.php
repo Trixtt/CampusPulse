@@ -70,86 +70,45 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        $imagePath = null;
+        try {
 
-        if ($request->hasFile('image')) {
+            $imagePath = null;
 
-            $imagePath = $request
-                ->file('image')
-                ->store('posts', 'public');
-        }
+            if ($request->hasFile('image')) {
 
-        $priority = "Medium";
-            $content = strtolower($request->content);
-
-            if (
-                str_contains($content, 'kebakaran') ||
-                str_contains($content, 'darurat')
-            ) {
-
-                $priority = "Urgent";
+                $imagePath = $request
+                    ->file('image')
+                    ->store('posts', 'public');
             }
 
-            elseif (
-                str_contains($content, 'pencurian') ||
-                str_contains($content, 'gelap') ||
-                str_contains($content, 'bahaya')
-            ) {
-
-                $priority = "High";
-            }
-
-            elseif (
-                str_contains($content, 'rusak')
-            ) {
-
-                $priority = "Medium";
-            }
-
-            elseif (
-                str_contains($content, 'kotor')
-            ) {
-
-                $priority = "Low";
-            }
-
-        $flagged = false;
-        $badWords = [
-            'bodoh',
-            'bangsat',
-            'tolol',
-            'anjing',
-            'goblok',
-        ];
-
-        foreach ($badWords as $word) {
-
-            if (str_contains($content, $word)) {
-
-                $flagged = true;
-
-                break;
-            }
-        }
-        
             $post = Post::create([
-            'user_id' => $request->user_id,
-            'category' => $request->category,
-            'content' => $request->content,
-            'type' => $request->type,
-            'priority' => $request->priority,
-            'status' => $request->status,
-            'location' => $request->location,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'image' => 'nullable|image',
-            'flagged' => $flagged,
-        ]);
 
-        return response()->json([
-            'message' => 'Posting berhasil',
-            'post' => $post
-        ]);
+                'user_id' => $request->user_id,
+
+                'content' => $request->content,
+
+                'category' => $request->category,
+
+                'type' => $request->type,
+
+                'image' => $imagePath,
+
+                'location' => $request->location,
+
+                'status' => $request->status,
+
+                'priority' => $request->priority,
+
+            ]);
+
+            return response()->json($post);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy($id)
